@@ -45,4 +45,3 @@ networks:
 volumes:
   redis:
     driver: local
-git pu
