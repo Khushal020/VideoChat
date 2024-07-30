@@ -1,0 +1,47 @@
+version: '3.3'
+services:
+  videochat-backend:
+    container_name: videochat-backend
+    image: 'videochat-backend:latest'
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    environment:
+      REDIS_HOST: redis://redis
+      REDIS_PORT: 6379
+    ports:
+      - '3000:3000'
+    networks:
+      - nesjs-network
+    depends_on:
+      - redis
+    volumes:
+      - '.:/usr/src/app'
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+  videochat-frontend:
+    image: videochat-frontend:latest
+    container_name: videochat-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    networks:
+      - nesjs-network
+    ports:
+      - 80:80
+    depends_on:
+      - videochat-backend
+  redis: # Name of container
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+    networks:
+      - nesjs-network
+networks:
+  nesjs-network:
+    driver: bridge
+volumes:
+  redis:
+    driver: local
